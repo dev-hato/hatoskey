@@ -186,6 +186,7 @@ export class InboxProcessorService {
 		} catch (e) {
 			if (e instanceof IdentifiableError) {
 				if (e.id === '689ee33f-f97c-479a-ac49-1b9f8140af99') return 'blocked notes with prohibited words';
+				if (e.id === 'd009795c-c989-4e9c-b254-08f52a8b7d95') return 'blocked notes from not follow local user';
 			}
 			throw e;
 		}

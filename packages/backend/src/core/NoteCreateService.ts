@@ -363,7 +363,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		if (this.config.misskeyBlockMentionsFromUnfamiliarRemoteUsers === true && user.host !== null && willCauseNotification) {
 			const userEntity = await this.usersRepository.findOneBy({ id: user.id });
 			if ((userEntity?.followersCount ?? 0) === 0) {
-				throw new Error('Temporarily, notes including mentions, replies and renotes to local-user from remote users which is not followed by local-users are not allowed');
+				throw new IdentifiableError('d009795c-c989-4e9c-b254-08f52a8b7d95', 'Temporarily, notes including mentions, replies and renotes to local-user from remote users which is not followed by local-users are not allowed');
 			}
 		}
 
