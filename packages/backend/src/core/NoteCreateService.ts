@@ -59,6 +59,7 @@ import { UtilityService } from '@/core/UtilityService.js';
 import { UserBlockingService } from '@/core/UserBlockingService.js';
 import { isReply } from '@/misc/is-reply.js';
 import { trackPromise } from '@/misc/promise-tracker.js';
+import { IdentifiableError } from '@/misc/identifiable-error.js';
 
 type NotificationType = 'reply' | 'renote' | 'quote' | 'mention';
 
@@ -150,8 +151,6 @@ type Option = {
 @Injectable()
 export class NoteCreateService implements OnApplicationShutdown {
 	#shutdownController = new AbortController();
-
-	public static ContainsProhibitedWordsError = class extends Error {};
 
 	constructor(
 		@Inject(DI.config)
@@ -264,7 +263,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		}
 
 		if (this.utilityService.isKeyWordIncluded(data.cw ?? data.text ?? '', meta.prohibitedWords)) {
-			throw new NoteCreateService.ContainsProhibitedWordsError();
+			throw new IdentifiableError('689ee33f-f97c-479a-ac49-1b9f8140af99', 'Note contains prohibited words');
 		}
 
 		const inSilencedInstance = this.utilityService.isSilencedHost(meta.silencedHosts, user.host);
@@ -357,6 +356,15 @@ export class NoteCreateService implements OnApplicationShutdown {
 			emojis = data.apEmojis ?? extractCustomEmojisFromMfm(combinedTokens);
 
 			mentionedUsers = data.apMentions ?? await this.extractMentionedUsers(user, combinedTokens);
+		}
+
+		const willCauseNotification = mentionedUsers.filter(u => u.host === null).length > 0 || data.reply?.userHost === null || data.renote?.userHost === null;
+
+		if (this.config.misskeyBlockMentionsFromUnfamiliarRemoteUsers === true && user.host !== null && willCauseNotification) {
+			const userEntity = await this.usersRepository.findOneBy({ id: user.id });
+			if ((userEntity?.followersCount ?? 0) === 0) {
+				throw new IdentifiableError('d009795c-c989-4e9c-b254-08f52a8b7d95', 'Temporarily, notes including mentions, replies and renotes to local-user from remote users which is not followed by local-users are not allowed');
+			}
 		}
 
 		tags = tags.filter(tag => Array.from(tag).length <= 128).splice(0, 32);
