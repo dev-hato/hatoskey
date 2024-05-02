@@ -87,6 +87,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<button v-tooltip="i18n.ts.hashtags" class="_button" :class="[$style.footerButton, { [$style.footerButtonActive]: withHashtags }]" @click="withHashtags = !withHashtags"><i class="ti ti-hash"></i></button>
 			<button v-if="postFormActions.length > 0" v-tooltip="i18n.ts.plugins" class="_button" :class="$style.footerButton" @click="showActions"><i class="ti ti-plug"></i></button>
 			<button v-tooltip="i18n.ts.emoji" :class="['_button', $style.footerButton]" @click="insertEmoji"><i class="ti ti-mood-happy"></i></button>
+			<button v-tooltip="i18n.ts.saveAsDraft" :class="['_button', $style.footerButton]" @click="saveDraft(false)"><i class="ti ti-note"></i></button>
 			<button v-if="showAddMfmFunction" v-tooltip="i18n.ts.addMfmFunction" :class="['_button', $style.footerButton]" @click="insertMfmFunction"><i class="ti ti-palette"></i></button>
 		</div>
 		<div :class="$style.footerRight">
@@ -260,7 +261,6 @@ const canPost = computed((): boolean => {
 			props.renote != null ||
 			(props.reply != null && quoteId.value != null)
 		) &&
-		(scheduledNoteDelete.value ? scheduledNoteDelete.value.isValid : true) &&
 		(1 <= textLength.value || 1 <= files.value.length || !!poll.value || !!renote.value) &&
 		(textLength.value <= maxTextLength.value) &&
 		(!poll.value || poll.value.choices.length >= 2);
@@ -269,53 +269,6 @@ const canPost = computed((): boolean => {
 const withHashtags = computed(defaultStore.makeGetterSetter('postFormWithHashtags'));
 const hashtags = computed(defaultStore.makeGetterSetter('postFormHashtags'));
 
-const bottomItemActionDef: Record<keyof typeof bottomItemDef, {
-	hide?: boolean;
-	active?: any;
-	action?: any;
-}> = reactive({
-	attachFile: {
-		action: chooseFileFrom,
-	},
-	poll: {
-		active: poll,
-		action: togglePoll,
-	},
-	scheduledNoteDelete: {
-		active: scheduledNoteDelete,
-		action: toggleScheduledNoteDelete,
-	},
-	useCw: {
-		active: useCw,
-		action: () => useCw.value = !useCw.value,
-	},
-	mention: {
-		action: insertMention,
-	},
-	hashtags: {
-		active: withHashtags,
-		action: () => withHashtags.value = !withHashtags.value,
-	},
-	plugins: {
-		hide: postFormActions.length === 0,
-		action: showActions,
-	},
-	emoji: {
-		action: insertEmoji,
-	},
-	addMfmFunction: {
-		hide: computed(() => !showAddMfmFunction.value),
-		action: insertMfmFunction,
-	},
-	clearPost: {
-		action: clear,
-	},
-	saveAsDraft: {
-		action: () => saveDraft(false),
-	},
-});
-
->>>>>>> 03d1c493a2 (feat: 下書き機能 (#144))
 watch(text, () => {
 	checkMissingMention();
 }, { immediate: true });
@@ -723,8 +676,6 @@ function onDrop(ev: DragEvent): void {
 async function saveDraft(auto = true) {
 	if (props.instant || props.mock) return;
 
-	if (auto && defaultStore.state.draftSavingBehavior !== 'auto') return;
-
 	if (!auto) {
 		// 手動での保存の場合は自動保存したものを削除した上で保存
 		await noteDrafts.remove(draftType.value, $i.id, 'default', draftAuxId.value as string);
@@ -738,7 +689,6 @@ async function saveDraft(auto = true) {
 		localOnly: localOnly.value,
 		files: files.value,
 		poll: poll.value,
-		scheduledNoteDelete: scheduledNoteDelete.value,
 	}, draftAuxId.value as string);
 
 	if (!auto) {
@@ -800,9 +750,6 @@ async function applyDraft(draft: noteDrafts.NoteDraft, native = false) {
 	files.value = (draft.data.files || []).filter(draftFile => draftFile);
 	if (draft.data.poll) {
 		poll.value = draft.data.poll;
-	}
-	if (draft.data.scheduledNoteDelete) {
-		scheduledNoteDelete.value = draft.data.scheduledNoteDelete;
 	}
 }
 
@@ -980,15 +927,15 @@ function cancel() {
 }
 
 async function closed() {
-	if (defaultStore.state.draftSavingBehavior === 'manual' && (text.value !== '' || files.value.length > 0)) {
-		os.confirm({
-			type: 'question',
-			text: i18n.ts.saveConfirm,
-		}).then(({ canceled }) => {
-			if (canceled) return;
-			saveDraft(false);
-		});
-	}
+// 	if (text.value !== '' || files.value.length > 0) {
+// 		os.confirm({
+// 			type: 'question',
+// 			text: i18n.ts.saveConfirm,
+// 		}).then(({ canceled }) => {
+// 			if (canceled) return;
+// 			saveDraft(false);
+// 		});
+ //	}
 }
 
 function insertMention() {
@@ -1075,7 +1022,7 @@ onMounted(() => {
 		await noteDrafts.migrate($i.id);
 
 		// 書きかけの投稿を復元
-		if (!props.instant && !props.mention && !props.specified && !props.mock && !defaultStore.state.disableNoteDrafting) {
+		if (!props.instant && !props.mention && !props.specified && !props.mock) {
 			const draft = await noteDrafts.get(draftType.value, $i.id, 'default', draftAuxId.value as string);
 			if (draft) applyDraft(draft, true);
 		}

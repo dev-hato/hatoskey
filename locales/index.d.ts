@@ -4961,10 +4961,6 @@ export interface Locale extends ILocale {
      */
     "drafts": string;
     /**
-     * 下書きの保存に関する動作
-     */
-    "draftSavingBehavior": string;
-    /**
      * 下書きとして保存
      */
     "saveAsDraft": string;
@@ -9919,16 +9915,6 @@ export interface Locale extends ILocale {
          * ループ再生
          */
         "loop": string;
-    };
-    "_draftSavingBehavior": {
-        /**
-         * 自動的に保存する
-         */
-        "auto": string;
-        /**
-         * 都度確認する
-         */
-        "manual": string;
     };
 }
 declare const locales: {

@@ -1236,7 +1236,6 @@ noDescription: "説明文はありません"
 alwaysConfirmFollow: "フォローの際常に確認する"
 inquiry: "お問い合わせ"
 drafts: "下書き"
-draftSavingBehavior: "下書きの保存に関する動作"
 saveAsDraft: "下書きとして保存"
 draftOverwriteConfirm: "下書きを適用すると現在入力されている内容はリセットされます。よろしいですか？"
 
@@ -2623,7 +2622,6 @@ _offlineScreen:
   title: "オフライン - サーバーに接続できません"
   header: "サーバーに接続できません"
 
-<<<<<<< HEAD
 _urlPreviewSetting:
   title: "URLプレビューの設定"
   enable: "URLプレビューを有効にする"
@@ -2643,14 +2641,4 @@ _mediaControls:
   pip: "ピクチャインピクチャ"
   playbackRate: "再生速度"
   loop: "ループ再生"
-=======
-_hideReactionCount:
-  none: "非表示にしない"
-  self: "自分のノートのみ"
-  others: "自分以外のノートのみ"
-  all: "全てのノート"
 
-_draftSavingBehavior:
-  auto: "自動的に保存する"
-  manual: "都度確認する"
->>>>>>> 03d1c493a2 (feat: 下書き機能 (#144))
