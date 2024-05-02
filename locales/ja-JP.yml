@@ -1235,6 +1235,9 @@ keepOriginalFilenameDescription: "この設定をオフにすると、アップ�
 noDescription: "説明文はありません"
 alwaysConfirmFollow: "フォローの際常に確認する"
 inquiry: "お問い合わせ"
+drafts: "下書き"
+saveAsDraft: "下書きとして保存"
+draftOverwriteConfirm: "下書きを適用すると現在入力されている内容はリセットされます。よろしいですか？"
 
 _bubbleGame:
   howToPlay: "遊び方"
@@ -2638,3 +2641,4 @@ _mediaControls:
   pip: "ピクチャインピクチャ"
   playbackRate: "再生速度"
   loop: "ループ再生"
+

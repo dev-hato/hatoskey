@@ -4956,6 +4956,18 @@ export interface Locale extends ILocale {
      * お問い合わせ
      */
     "inquiry": string;
+    /**
+     * 下書き
+     */
+    "drafts": string;
+    /**
+     * 下書きとして保存
+     */
+    "saveAsDraft": string;
+    /**
+     * 下書きを適用すると現在入力されている内容はリセットされます。よろしいですか？
+     */
+    "draftOverwriteConfirm": string;
     "_bubbleGame": {
         /**
          * 遊び方
